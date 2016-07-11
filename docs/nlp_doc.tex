@@ -1,0 +1,145 @@
+% Test tex file!
+\documentclass[a4paper,12pt]{article}
+\usepackage{CJKutf8}
+%%%%%% 设置字号 %%%%%%
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont}
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont}
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont}
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont}
+\newcommand{\xiaoerhao}{\fontsize{18pt}{\baselineskip}\selectfont}
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont}
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont}
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont}
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont}
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}
+\begin{CJK}{UTF8}{gbsn}
+\begin{document}
+\title{自然语言处理大作业-情感分类}
+\author{陈立国\footnote{学号：2015E8016061028，电子邮件：sunshinenum@foxmail.com}
+\\[2ex]
+\xiaosihao 中国科学院计算机网络信息中心
+\\[2ex]
+}
+
+\date{2016.5.31}
+\maketitle
+\newpage
+\end{CJK}
+
+\begin{CJK}{UTF8}{gbsn}
+\section{引言}
+\paragraph{}
+随着web2.0时代的加速发展，人们越来越倾向于在网络上表达自己的情感倾向，由于人工处理这些大众舆论费时费力，因此诞生了情感分析的研究方向。
+\paragraph{}
+对于新闻评论的情感分析可以及时的做到舆情监测，对于产品评论的舆情分析有助于公司及时了解产品的反馈。
+\section{国内外相关研究}
+\paragraph{}
+情感分析又称为意见挖掘，对带有情感倾向的文本进行分析、处理、归纳和推理的过程。此方面的研究根据处理文本的粒度不同可以分为：词语级别的、短语级别的、句子级别的、篇章级别的等几个研究层次。根据处理文本的类别分为基于新闻评论的情感分析和基于产品评论的情感分析，基于新闻评论的情感分析多用于舆情的分析和信息预测，基于产品评论的情感分析多用于分析消费者对产品的喜好和倾向。
+\paragraph{}
+情感分析中，抽取评价词语是一个重要的任务。评价词语的抽取和判别一般采用两种方法，分别是基于词典的方法和基于语料库的方法。基于词典的方法一般是使用WordNet等词典中的极性信息和同义反义信息来识别情感倾向和强烈程度，但是这种方法依赖情感词典，词典构建成本大。基于语料库的方法简单易行，但是需要标注数据，而且针对一种评论的模型应用到另一种评论后效果会大打折扣。
+\section{我们的思路}
+\paragraph{}
+本文对豆瓣网书籍评论进行情感分类，通过自己设定的一种评分指标对评论抽取特征进行分类，取得了非常好的效果。
+\paragraph{}
+本文采用词袋模型，首先使用分词软件对评论进行分词，然后统计词语$W_{i}$在正向和负向评论中出现的次数
+$C_{ij}$，其中$j$对应分类的数目，在本文中$j\in{0,1}$，然后计算词语得分：
+\begin{equation}
+Score(W_{i}) = \frac {\sum_{j=0,1}^{}(C_{ij})}{\prod_{j=0,1}(C_{ij})+1} * log(\sum_{j=0,1}^{}(C_{ij}))
+\end{equation}
+将词语按照$Score$排序，取排名前n个的词语作为特征词，对于每个评论生成特征向量，最后输入分类器分类。
+\paragraph{}
+在实验中特征的表示非常重要，为了选出那些在正面和负面分类中词频相差较大的词语，对词在正负样本中的词频
+取调和平均的倒数，为了防止分母为0，分母上加1，为了考虑词频对$Score$的影响，最后乘以
+$log(\sum_{j=0,1}(W_{ij}))$。在训练样本数目达到4000时，使用本特征4折交叉验证得到的准确率为0.97175，远高于使用
+tf-idf的0.909.
+\section{实验结果及其分析}
+\paragraph{}
+为了验证此特征的效果，实验中使用了tf(table\ref{table:1})、tf-idf(table\ref{table:2})进行对比实验，实验使用朴素贝叶斯分类器，实验所使用的数据为产品评论数据，
+包括Movie reviews of sentences (Pang and Lee)，豆瓣网的书评、京东电脑评论、携程网房间评论，每种评论分积极和消极，各有2000各样本，第一各数据集各1000，为英文数据，无需分词，后三个数据集需要进行分词处理，分词使用分词工具jieba。
+
+\begin{CJK}{UTF8}{gbsn}
+\begin{table}
+\centering
+
+\paragraph{}
+\begin{tabular}{|c|c|c|c|}
+\hline
+数据集 & 准确率 & 召回率 & F值\\
+\hline
+pang\_lee\_movie\_reviews & 0.694 & 0.417 & 0.575\\
+当当网书评 & 0.887 & 0.925 & 0.891\\
+京东网电脑评论 & 0.893 & 0.890 & 0.892\\
+携程网旅店评论 & 0.884 & 0.0.874 & 0.882\\
+\hline
+\end{tabular}
+\caption{tf特征实验结果}
+\label{table:1}
+
+\paragraph{}
+\begin{tabular}{|c|c|c|c|}
+\hline
+数据集 & 准确率 & 召回率 & F值\\
+\hline
+pang\_lee\_movie\_reviews & 0.793 & 0.808 & 0.737\\
+当当网书评 & 0.909 & 0.908 & 0.909\\
+京东网电脑评论 & 0.890 & 0.894 & 0.890\\
+携程网旅店评论 & 0.891 & 0.886 & 0.890\\
+\hline
+\end{tabular}
+\caption{tf-idf特征实验结果}
+\label{table:2}
+
+\paragraph{}
+\begin{tabular}{|c|c|c|c|}
+\hline
+数据集 & 准确率 & 召回率 & F值\\
+\hline
+pang\_lee\_movie\_reviews & \textbf{0.962} & \textbf{0.963} & \textbf{0.926}\\
+当当网书评 & \textbf{0.972} & \textbf{0.953} & \textbf{0.971}\\
+京东网电脑评论 & 0.895 & 0.845 & 0.889\\
+携程网旅店评论 & 0.904 & 0.962 & 0.909\\
+\hline
+\end{tabular}
+\caption{自定义特征实验结果}
+\label{table:3}
+\end{table}
+\paragraph{}
+本特征所选择的词汇有一定特点，首先正负两类中该词汇出现次数有较大差异，其次，该词汇出现次数相对较多。所以对于某种
+评论正负样本中的词汇有较大差异时效果较好。
+\paragraph{}
+通过以上实验数据发现，在处理书评时，本文所提出的特征有极好的效果，得分明显高于tf-idf特征。
+仔细分析，原因如下：对于评论的情感词，在不同的领域是不同的，对于电脑评论可以用“好”、“不好”来评价，
+这种词前加否定的特征词在tf-idf中是会被选出的，tf-idf选中词频达标、文档频率不是很高的特征，而在书籍的评论中，
+特征词会多于在电脑的评论，电脑的评价方面相对单一，因此评价词也相对较少，评论中往往围绕配置、使用体验展开，
+因此总体来说特征词数目较少，但是每个特征词的词频很高。
+\paragraph{}
+而对于书籍和影评，仁者见仁，智者见智，评价的方面很多，评论特征词也相对较多，但是每个特征词的数目不会太多。
+而积极词汇一般有别于消极词汇，比如“金玉良言”是褒义词，在消极词汇中一般不会出现这个词，再比如“启迪”、“跌宕起伏”、“毒害”、“肤浅”等等。
+综上所述，自定义特征对书籍这类正负样本特征词不同的分类效果较好，在其他类别的评论中表现一般。
+\section{结束语}
+\paragraph{}
+本文主要是探讨了自定义特征对于不同商品评论的情感分类效果，通过对情感词的分析发现，书籍类评论的情感词正负样本的差距较大，使用自定义特征效果很好，而对于正负样本特征词差距较小的评论，表现和tf-idf等相差不大。
+在后续的工作中，会继续研究发现其他类似书籍的评论类型。
+\end{CJK}
+\end{CJK}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
