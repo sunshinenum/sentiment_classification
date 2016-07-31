@@ -1,4 +1,4 @@
-#! /home/chen/anaconda2/envs/tensor/bin/python
+#! /usr/bin/env python
 # -*- coding:utf-8 -*-
 __author__ = 'Liguo Chen'
 import os

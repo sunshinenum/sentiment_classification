@@ -1,4 +1,4 @@
-#! /home/chen/anaconda2/envs/tensor/bin/python
+#! /usr/bin/env python
 # -*- coding:utf-8 -*-
 import jieba
 import sys
@@ -11,7 +11,7 @@ __author__ = 'Liguo Chen'
 def segment_reviews():
     """
     segment reviews and return reviews list.
-    :return:[[],[]]
+    :return:[[positive reviews],[negative reviews]]
     """
     # read data
     os.chdir(book_data_path)

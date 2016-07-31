@@ -1,4 +1,4 @@
-#! /home/chen/anaconda2/envs/tensor/bin/python
+#! /usr/bin/env python
 # -*- coding:utf-8 -*-
 __author__ = 'Liguo Chen'
 import math
@@ -12,8 +12,8 @@ import time
 def extract_features(reviews):
     """
     extract features from reviews.
-    :param reviews:[[], []]
-    :return:[[], []]
+    :param reviews:[[positive reviews], [negative reviews]]
+    :return:[[positive reviews features], [negative reviews features]]
     """
     # score = (count1 + count2) / (count1 * count2 + 1.0) * log(count1 + count2)
     # {word:score, ..}
@@ -30,15 +30,15 @@ def extract_features(reviews):
     for reviews_tmp in reviews:
         words_tmp = []
         words_bag_tmp = set()
-        struct_words_tmp = []
+        structured_words_tmp = []
         for review in reviews_tmp:
             words_in_one_review = review.split(" ")
-            struct_words_tmp.append(words_in_one_review)
+            structured_words_tmp.append(words_in_one_review)
             words_bag_tmp = words_bag_tmp | set(words_in_one_review)
             words_tmp += words_in_one_review
         words.append(words_tmp)
         words_bag.append(words_bag_tmp)
-        struct_words.append(struct_words_tmp)
+        struct_words.append(structured_words_tmp)
     print "split words cost:%.2fs" % (time.time() - start)
     start = time.time()
     # get counts
@@ -68,9 +68,9 @@ def extract_features(reviews):
     # generate vectors
     # [[[], ..], [[], ..]]
     vectors = []
-    for struct_words_tmp in struct_words:
+    for structured_words_tmp in struct_words:
         vectors_tmp = []
-        for review_words in struct_words_tmp:
+        for review_words in structured_words_tmp:
             vector = gen_vector(review_words, dict(scores))
             vectors_tmp.append(vector)
         vectors.append(vectors_tmp)
